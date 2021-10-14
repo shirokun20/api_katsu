@@ -109,12 +109,12 @@ class Pengguna extends ResourceController
         $user = $model->where(['pengguna_nohp' => $this->request->getVar('phone')])->first();
         if ($user) return $this->fail(['phone' => 'Nomor Telepon sudah digunakan!!']);
         
-        $insert['pengguna_nohp']       = $this->request->getVar('phone');
-        $insert['pengguna_nama']       = $this->request->getVar('name');
-        $insert['pengguna_jenis']      = $this->request->getVar('level') == "Admin" ? "Admin" : "Pegawai";;
-        $insert['status_pengguna_id']  = 1;
+        $req['pengguna_nohp']       = $this->request->getVar('phone');
+        $req['pengguna_nama']       = $this->request->getVar('name');
+        $req['pengguna_jenis']      = $this->request->getVar('level') == "Admin" ? "Admin" : "Pegawai";;
+        $req['status_pengguna_id']  = 1;
 
-        if ($model->save($insert)) return $this->setResponseFormat('json')->respond([
+        if ($model->save($req)) return $this->setResponseFormat('json')->respond([
             'status' => 200,
             'error' => false,
             'message' => [
@@ -202,7 +202,7 @@ class Pengguna extends ResourceController
                 ],
             ]);
 
-            return $this->fail("Gagal melakukan pembaharuan data pengguna!");
+            else return $this->fail("Gagal melakukan pembaharuan data pengguna!");
         }
         return $this->fail("Tidak ada data pengguna yang akan di diperbaharui!");
     }
@@ -226,12 +226,8 @@ class Pengguna extends ResourceController
                         "success" => "Berhasil menghapus data!"
                     ],
                 ]);
-            } else {
-                return $this->failNotFound("Akun tidak ditemukan!");
-            }
-        } else {
-            return $this->failNotFound("ID Wajib terisi!!");
-        }
+            } else return $this->failNotFound("Akun tidak ditemukan!");
+        } else return $this->failNotFound("ID Wajib terisi!!");
     }
     /**
      * Primary Function get status pengguna

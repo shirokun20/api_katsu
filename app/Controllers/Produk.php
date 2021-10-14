@@ -97,18 +97,16 @@ class Produk extends ResourceController
         //
         if (!$validation->withRequest($this->request)->run()) return $this->fail($validation->getErrors());
         $model = new ProdukModel();
-        $user = $model->where(['produk_kode' => strtoupper($this->request->getVar('pkode'))])->first();
-        if ($user) return $this->fail(['pkode' => 'Kode Produk sudah digunakan!!']);
+        $check = $model->where(['produk_kode' => strtoupper($this->request->getVar('pkode'))])->first();
+        if ($check) return $this->fail(['pkode' => 'Kode Produk sudah digunakan!!']);
         // 
-        $insert['produk_kode']           = strtoupper($this->request->getVar('pkode'));
-        $insert['produk_nama']           = $this->request->getVar('pnama');
-        $insert['produk_harga']          = $this->request->getVar('pharga');
-        $insert['produk_stok']           = $this->request->getVar('pstok');
-        if ($this->request->getVar('pretur')) {
-            $insert['produk_stok_retur'] = $this->request->getVar('pretur');
-        }
+        $req['produk_kode']           = strtoupper($this->request->getVar('pkode'));
+        $req['produk_nama']           = $this->request->getVar('pnama');
+        $req['produk_harga']          = $this->request->getVar('pharga');
+        $req['produk_stok']           = $this->request->getVar('pstok');
+        if ($this->request->getVar('pretur')) $req['produk_stok_retur'] = $this->request->getVar('pretur');
 
-        if ($model->save($insert)) return $this->setResponseFormat('json')->respond([
+        if ($model->save($req)) return $this->setResponseFormat('json')->respond([
             'status' => 200,
             'error' => false,
             'message' => [
@@ -125,9 +123,11 @@ class Produk extends ResourceController
     public function deleteData($id = "")
     {
         $getLevel = $this->_checkLevel();
+        // 
         if ($getLevel->level != "Admin") return $this->fail("Maaf anda tidak bisa mengakses halaman ini!!");
         $model = new ProdukModel();
         $check = $model->where(['produk_kode' => strtoupper($id)])->first();
+        // 
         if ($id != "") {
             if ($check) {
                 $model->delete($id);
@@ -138,12 +138,8 @@ class Produk extends ResourceController
                         "success" => "Berhasil menghapus data!"
                     ],
                 ]);
-            } else {
-                return $this->failNotFound("Akun tidak ditemukan!");
-            }
-        } else {
-            return $this->failNotFound("Kode produk wajib terisi!!");
-        }
+            } else return $this->failNotFound("Akun tidak ditemukan!");
+        } else return $this->failNotFound("Kode produk wajib terisi!!");
     }
     /**
      * Primary Function update data
@@ -155,35 +151,23 @@ class Produk extends ResourceController
         //
         if ($getLevel->level != "Admin") return $this->fail("Maaf anda tidak bisa mengakses halaman ini!!");
         //
-        $validation =  \Config\Services::validation();
-        $validation->setRules([
-            'pnama'  => ['label' => 'Nama Produk', 'rules' => 'required'],
-            'pkode'  => ['label' => 'Kode Produk', 'rules' => 'required'],
-            'pharga' => ['label' => 'Harga Produk', 'rules' => 'required'],
-            'pstok'  => ['label' => 'Stok Produk', 'rules' => 'required'],
-        ]);
-        //
-        if (!$validation->withRequest($this->request)->run()) return $this->fail($validation->getErrors());
         $model = new ProdukModel();
-        $user = $model->where(['produk_kode' => strtoupper($this->request->getVar('pkode'))])->first();
-        if ($user) return $this->fail(['pkode' => 'Kode Produk sudah digunakan!!']);
+        $check = $model->where(['produk_kode' => strtoupper($id)])->first();
+        if (!$check) return $this->fail('Produk tidak ditemukan!!');
         // 
-        $insert['produk_kode']           = strtoupper($this->request->getVar('pkode'));
-        $insert['produk_nama']           = $this->request->getVar('pnama');
-        $insert['produk_harga']          = $this->request->getVar('pharga');
-        $insert['produk_stok']           = $this->request->getVar('pstok');
-        if ($this->request->getVar('pretur')) {
-            $insert['produk_stok_retur'] = $this->request->getVar('pretur');
-        }
-
-        if ($model->save($insert)) return $this->setResponseFormat('json')->respond([
+        $req['produk_kode'] = strtoupper($id);
+        if ($this->request->getVar('pnama')) $req['produk_nama']        = $this->request->getVar('pnama');
+        if ($this->request->getVar('pharga')) $req['produk_harga']      = $this->request->getVar('pharga');
+        if ($this->request->getVar('pstok')) $req['produk_stok']        = $this->request->getVar('pstok');
+        if ($this->request->getVar('pretur')) $req['produk_stok_retur'] = $this->request->getVar('pretur');
+        if ($model->save($req)) return $this->setResponseFormat('json')->respond([
             'status' => 200,
             'error' => false,
             'message' => [
-                "success" => "Berhasil melakukan penambahan data produk!"
+                "success" => "Berhasil melakukan pembaharuan data produk!"
             ],
         ]);
 
-        else return $this->fail("Gagal melakukan penambahan data produk!");
+        else return $this->fail("Gagal melakukan pembaharuan data produk!");
     }
 }
