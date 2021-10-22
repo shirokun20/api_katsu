@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Controllers;
 
 use CodeIgniter\RESTful\ResourceController;
@@ -43,7 +42,7 @@ class Pengguna extends ResourceController
         // Query
         $pengguna
             ->select('pengguna_id as id')
-            ->select('pengguna_nama as name')
+            ->select('pengguna_nama as nama')
             ->select('pengguna_nohp as phone')
             ->select('pengguna_jenis as level')
             ->select('sp.status_pengguna_nama as status')
@@ -99,7 +98,7 @@ class Pengguna extends ResourceController
         //
         $validation =  \Config\Services::validation();
         $validation->setRules([
-            'name' => ['label' => 'Nama', 'rules' => 'required'],
+            'nama' => ['label' => 'Nama', 'rules' => 'required'],
             'phone' => ['label' => 'Nomor Telepon', 'rules' => 'required'],
             'level' => ['label' => 'Level', 'rules' => 'required'],
         ]);
@@ -110,7 +109,7 @@ class Pengguna extends ResourceController
         if ($user) return $this->fail(['phone' => 'Nomor Telepon sudah digunakan!!']);
         
         $req['pengguna_nohp']       = $this->request->getVar('phone');
-        $req['pengguna_nama']       = $this->request->getVar('name');
+        $req['pengguna_nama']       = $this->request->getVar('nama');
         $req['pengguna_jenis']      = $this->request->getVar('level') == "Admin" ? "Admin" : "Pegawai";;
         $req['status_pengguna_id']  = 1;
 
@@ -132,7 +131,7 @@ class Pengguna extends ResourceController
         $pengguna = new PenggunaModel();
         return $pengguna
             ->select('pengguna_id as id')
-            ->select('pengguna_nama as name')
+            ->select('pengguna_nama as nama')
             ->select('pengguna_nohp as phone')
             ->select('pengguna_jenis as level')
             ->select('sp.status_pengguna_nama as status')
@@ -180,7 +179,7 @@ class Pengguna extends ResourceController
         // 
         $req['pengguna_id'] = $id;
         // Request JSON
-        if ($this->request->getVar('name')) $req['pengguna_nama'] = $this->request->getVar('name');
+        if ($this->request->getVar('nama')) $req['pengguna_nama'] = $this->request->getVar('nama');
         if ($this->request->getVar('phone')) {
             $check = $model->where([
                 'pengguna_id !=' => $req['pengguna_id'],

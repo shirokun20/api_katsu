@@ -5,8 +5,8 @@ namespace App\Controllers;
 use CodeIgniter\RESTful\ResourceController;
 use CodeIgniter\API\ResponseTrait;
 use Firebase\JWT\JWT;
-use App\Models\ProdukModel;
-class Produk extends ResourceController
+use App\Models\BahanModel;
+class Bahan extends ResourceController
 {
     private $db;
 
@@ -39,18 +39,17 @@ class Produk extends ResourceController
         // request 
         $search = $this->request->getGet('search') != "" ? $this->request->getGet('search') : "";
         // Query
-        $sql = $this->db->table('produk');
-        $sql->select('produk_kode as pkode');
-        $sql->select('produk_nama as pnama');
-        $sql->select('produk_harga as pharga');
-        $sql->select('produk_stok as pstok');
-        $sql->select('produk_stok_retur as pretur');
+        $sql = $this->db->table('bahan');
+        $sql->select('bahan_kode as bkode');
+        $sql->select('bahan_nama as bnama');
+        $sql->select('bahan_stok as bstok');
+        $sql->select('bahan_jenis_ukuran as bjenis_ukuran');
         // Jika ada params search
         if ($search != "") {
             $sql->groupStart();
-            $sql->like('produk_nama', $search, 'both');
-            $sql->orLike('produk_harga', $search, 'both');
-            $sql->orLike('produk_stok', $search, 'both');
+            $sql->like('bahan_kode', $search, 'both');
+            $sql->orLike('bahan_nama', $search, 'both');
+            $sql->orLike('bahan_stok', $search, 'both');
             $sql->groupEnd();
         }
         // Jika ada params status
@@ -89,32 +88,31 @@ class Produk extends ResourceController
         //
         $validation =  \Config\Services::validation();
         $validation->setRules([
-            'pnama'  => ['label' => 'Nama Produk', 'rules' => 'required'],
-            'pkode'  => ['label' => 'Kode Produk', 'rules' => 'required'],
-            'pharga' => ['label' => 'Harga Produk', 'rules' => 'required'],
-            'pstok'  => ['label' => 'Stok Produk', 'rules' => 'required'],
+            'bnama'          => ['label' => 'Nama Bahan', 'rules' => 'required'],
+            'bkode'          => ['label' => 'Kode Bahan', 'rules' => 'required'],
+            'bstok'          => ['label' => 'Stok Bahan', 'rules' => 'required'],
+            'bjenis_ukuran'  => ['label' => 'Jenis Ukuran/Berat Bahan', 'rules' => 'required'],
         ]);
         //
         if (!$validation->withRequest($this->request)->run()) return $this->fail($validation->getErrors());
-        $model = new ProdukModel();
-        $check = $model->where(['produk_kode' => strtoupper($this->request->getVar('pkode'))])->first();
-        if ($check) return $this->fail(['pkode' => 'Kode Produk sudah digunakan!!']);
+        $model = new BahanModel();
+        $check = $model->where(['bahan_kode' => strtoupper($this->request->getVar('bkode'))])->first();
+        if ($check) return $this->fail(['bkode' => 'Kode Bahan sudah digunakan!!']);
         // 
-        $req['produk_kode']           = strtoupper($this->request->getVar('pkode'));
-        $req['produk_nama']           = $this->request->getVar('pnama');
-        $req['produk_harga']          = $this->request->getVar('pharga');
-        $req['produk_stok']           = $this->request->getVar('pstok');
-        if ($this->request->getVar('pretur')) $req['produk_stok_retur'] = $this->request->getVar('pretur');
+        $req['bahan_kode']           = strtoupper($this->request->getVar('bkode'));
+        $req['bahan_nama']           = $this->request->getVar('bnama');
+        $req['bahan_stok']           = $this->request->getVar('bstok');
+        $req['bahan_jenis_ukuran']   = $this->request->getVar('bjenis_ukuran');
 
         if ($model->save($req)) return $this->setResponseFormat('json')->respond([
             'status' => 200,
             'error' => false,
             'message' => [
-                "success" => "Berhasil melakukan penambahan data produk!"
+                "success" => "Berhasil melakukan penambahan data bahan!"
             ],
         ]);
 
-        else return $this->fail("Gagal melakukan penambahan data produk!");
+        else return $this->fail("Gagal melakukan penambahan data bahan!");
     }
     /**
      * Primary Function delete data
@@ -125,8 +123,8 @@ class Produk extends ResourceController
         $getLevel = $this->_checkLevel();
         // 
         if ($getLevel->level != "Admin") return $this->fail("Maaf anda tidak bisa mengakses halaman ini!!");
-        $model = new ProdukModel();
-        $check = $model->where(['produk_kode' => strtoupper($id)])->first();
+        $model = new BahanModel();
+        $check = $model->where(['bahan_kode' => strtoupper($id)])->first();
         // 
         if ($id != "") {
             if ($check) {
@@ -139,7 +137,7 @@ class Produk extends ResourceController
                     ],
                 ]);
             } else return $this->failNotFound("Akun tidak ditemukan!");
-        } else return $this->failNotFound("Kode produk wajib terisi!!");
+        } else return $this->failNotFound("Kode bahan wajib terisi!!");
     }
     /**
      * Primary Function update data
@@ -151,23 +149,22 @@ class Produk extends ResourceController
         //
         if ($getLevel->level != "Admin") return $this->fail("Maaf anda tidak bisa mengakses halaman ini!!");
         //
-        $model = new ProdukModel();
-        $check = $model->where(['produk_kode' => strtoupper($id)])->first();
-        if (!$check) return $this->fail('Produk tidak ditemukan!!');
+        $model = new BahanModel();
+        $check = $model->where(['bahan_kode' => strtoupper($id)])->first();
+        if (!$check) return $this->fail('Bahan tidak ditemukan!!');
         // 
-        $req['produk_kode'] = strtoupper($id);
-        if ($this->request->getVar('pnama')) $req['produk_nama']        = $this->request->getVar('pnama');
-        if ($this->request->getVar('pharga')) $req['produk_harga']      = $this->request->getVar('pharga');
-        if ($this->request->getVar('pstok')) $req['produk_stok']        = $this->request->getVar('pstok');
-        if ($this->request->getVar('pretur')) $req['produk_stok_retur'] = $this->request->getVar('pretur');
+        $req['bahan_kode'] = strtoupper($id);
+        if ($this->request->getVar('bnama')) $req['bahan_nama']        = $this->request->getVar('bnama');
+        if ($this->request->getVar('bstok')) $req['bahan_stok']        = $this->request->getVar('bstok');
+        if ($this->request->getVar('bjenis_ukuran')) $req['bahan_jenis_ukuran'] = $this->request->getVar('bjenis_ukuran');
         if ($model->save($req)) return $this->setResponseFormat('json')->respond([
             'status' => 200,
             'error' => false,
             'message' => [
-                "success" => "Berhasil melakukan pembaharuan data produk!"
+                "success" => "Berhasil melakukan pembaharuan data bahan!"
             ],
         ]);
 
-        else return $this->fail("Gagal melakukan pembaharuan data produk!");
+        else return $this->fail("Gagal melakukan pembaharuan data bahan!");
     }
 }

@@ -49,6 +49,15 @@ $routes->get('api/v1/produk', 'Produk::showData', ['filter'=>'auth']);
 $routes->post('api/v1/produk', 'Produk::addData', ['filter'=>'auth']);
 $routes->put('api/v1/produk/(:alphanum)', 'Produk::updateData/$1', ['filter'=>'auth']);
 $routes->delete('api/v1/produk/(:alphanum)', 'Produk::deleteData/$1', ['filter'=>'auth']);
+// Bahan
+$routes->get('api/v1/bahan', 'Bahan::showData', ['filter'=>'auth']);
+$routes->post('api/v1/bahan', 'Bahan::addData', ['filter'=>'auth']);
+$routes->put('api/v1/bahan/(:alphanum)', 'Bahan::updateData/$1', ['filter'=>'auth']);
+$routes->delete('api/v1/bahan/(:alphanum)', 'Bahan::deleteData/$1', ['filter'=>'auth']);
+// Restok Produk
+$routes->get('api/v1/resproduk', 'RestokProduk::showData', ['filter'=>'auth']);
+$routes->post('api/v1/resproduk', 'RestokProduk::addData', ['filter'=>'auth']);
+$routes->put('api/v1/resproduk/(:num)', 'RestokProduk::updateData/$1', ['filter'=>'auth']);
 //
 $routes->set404Override(function () {
     $this->response->setStatusCode(404, 'Nope. Not here.');

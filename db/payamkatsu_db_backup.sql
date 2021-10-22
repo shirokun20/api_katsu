@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Waktu pembuatan: 14 Okt 2021 pada 17.56
+-- Waktu pembuatan: 20 Okt 2021 pada 17.40
 -- Versi server: 10.4.17-MariaDB
 -- Versi PHP: 7.3.26
 
@@ -31,7 +31,7 @@ CREATE TABLE `bahan` (
   `bahan_kode` varchar(20) NOT NULL,
   `bahan_nama` varchar(100) NOT NULL,
   `bahan_stok` double NOT NULL,
-  `bahan_jenis_ukuran` varchar(5) NOT NULL DEFAULT 'kg'
+  `bahan_jenis_ukuran` varchar(10) NOT NULL DEFAULT 'kg'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -39,7 +39,18 @@ CREATE TABLE `bahan` (
 --
 
 INSERT INTO `bahan` (`bahan_kode`, `bahan_nama`, `bahan_stok`, `bahan_jenis_ukuran`) VALUES
-('AF01', 'Ayam Fillet', 2, 'kg');
+('AF', 'Ayam Fillet', 2, 'kg'),
+('BP', 'Bawang Putih', 50, 'gram'),
+('GRM', 'Garam', 55, 'gram'),
+('GS', 'Gas', 3, 'kg'),
+('MP', 'Merica (Butir)', 20, 'gram'),
+('MSK', 'Masako (Penyedap Rasa)', 3, 'bungkus'),
+('MYK', 'Minyak', 1, 'Liter'),
+('PMK', 'Plastik Mika', 40, 'pcs'),
+('SS', 'Sasa', 1, 'bungkus'),
+('TLR', 'Telur', 250, 'gram'),
+('TM', 'Tepung Maizena', 100, 'gram'),
+('TT', 'Tepung Terigu', 0.5, 'kg');
 
 -- --------------------------------------------------------
 
@@ -82,8 +93,15 @@ CREATE TABLE `detail_restok_produk` (
   `detail_restok_produk_id` int(100) NOT NULL,
   `restok_produk_id` int(11) NOT NULL,
   `bahan_kode` varchar(20) NOT NULL,
-  `restok_produk_jumlah` double NOT NULL COMMENT 'Jumlah bahan'
+  `detail_restok_produk_jumlah` double NOT NULL COMMENT 'Jumlah bahan'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data untuk tabel `detail_restok_produk`
+--
+
+INSERT INTO `detail_restok_produk` (`detail_restok_produk_id`, `restok_produk_id`, `bahan_kode`, `detail_restok_produk_jumlah`) VALUES
+(1, 1, 'AF', 2);
 
 -- --------------------------------------------------------
 
@@ -179,7 +197,7 @@ CREATE TABLE `produk` (
 INSERT INTO `produk` (`produk_kode`, `produk_nama`, `produk_harga`, `produk_stok`, `produk_stok_retur`) VALUES
 ('AK', 'Ayam Katsu', 7000, 40, 0),
 ('NS', 'Nasi', 5000, 40, 0),
-('PK', 'Paket Ayam Katsu dan Nasi', 12000, 20, 0);
+('PK', 'Paket Nasi Dan Ayam Katsu', 12000, 20, 0);
 
 -- --------------------------------------------------------
 
@@ -190,9 +208,16 @@ INSERT INTO `produk` (`produk_kode`, `produk_nama`, `produk_harga`, `produk_stok
 CREATE TABLE `restok_produk` (
   `restok_produk_id` int(10) NOT NULL,
   `restok_produk_waktu` timestamp NOT NULL DEFAULT current_timestamp(),
-  `restok_produk_jumlah` int(11) NOT NULL COMMENT 'Jumlah katsu yang dihasilkan',
+  `restok_produk_jumlah` int(11) NOT NULL COMMENT 'Jumlah Produk/Katsu yang dihasilkan',
   `pengguna_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data untuk tabel `restok_produk`
+--
+
+INSERT INTO `restok_produk` (`restok_produk_id`, `restok_produk_waktu`, `restok_produk_jumlah`, `pengguna_id`) VALUES
+(1, '2021-10-20 14:33:39', 40, 1);
 
 -- --------------------------------------------------------
 
@@ -361,6 +386,24 @@ ALTER TABLE `suplier`
 --
 
 --
+-- AUTO_INCREMENT untuk tabel `detail_pembelian`
+--
+ALTER TABLE `detail_pembelian`
+  MODIFY `detail_pembelian_id` int(100) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT untuk tabel `detail_penjualan`
+--
+ALTER TABLE `detail_penjualan`
+  MODIFY `detail_penjualan_id` int(10) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT untuk tabel `detail_restok_produk`
+--
+ALTER TABLE `detail_restok_produk`
+  MODIFY `detail_restok_produk_id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT untuk tabel `pengguna`
 --
 ALTER TABLE `pengguna`
@@ -370,7 +413,7 @@ ALTER TABLE `pengguna`
 -- AUTO_INCREMENT untuk tabel `restok_produk`
 --
 ALTER TABLE `restok_produk`
-  MODIFY `restok_produk_id` int(10) NOT NULL AUTO_INCREMENT;
+  MODIFY `restok_produk_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT untuk tabel `status_pemesanan`
