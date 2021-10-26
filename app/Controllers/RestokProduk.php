@@ -158,12 +158,12 @@ class RestokProduk extends ResourceController
                 'status' => 200,
                 'error' => false,
                 'message' => [
-                    "success" => "Berhasil melakukan transaksi penambahan stok produk!"
+                    "success" => "Berhasil mengisi transaksi penambahan stok produk!"
                 ],
             ]);
         }
 
-        else return $this->fail("Gagal melakukan transaksi penambahan stok produk!");
+        else return $this->fail("Gagal mengisi transaksi penambahan stok produk!");
     }
     /**
      * Primary Function add data
@@ -199,12 +199,12 @@ class RestokProduk extends ResourceController
                     'status' => 200,
                     'error' => false,
                     'message' => [
-                        "success" => "Berhasil melakukan transaksi penambahan stok produk!"
+                        "success" => "Berhasil melakukan perubahan transaksi penambahan stok produk!"
                     ],
                 ]);
             }
             
-            else return $this->fail("Gagal melakukan transaksi penambahan stok produk!");
+            else return $this->fail("Gagal melakukan perubahan transaksi penambahan stok produk!");
         } else return $this->fail($check['message']);
     }
     /**

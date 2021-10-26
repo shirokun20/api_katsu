@@ -58,6 +58,10 @@ $routes->delete('api/v1/bahan/(:alphanum)', 'Bahan::deleteData/$1', ['filter'=>'
 $routes->get('api/v1/resproduk', 'RestokProduk::showData', ['filter'=>'auth']);
 $routes->post('api/v1/resproduk', 'RestokProduk::addData', ['filter'=>'auth']);
 $routes->put('api/v1/resproduk/(:num)', 'RestokProduk::updateData/$1', ['filter'=>'auth']);
+// Restok Produk
+$routes->get('api/v1/pembelian', 'Pembelian::showData', ['filter'=>'auth']);
+$routes->post('api/v1/pembelian', 'Pembelian::addData', ['filter'=>'auth']);
+$routes->put('api/v1/pembelian', 'Pembelian::updateData', ['filter'=>'auth']);
 //
 $routes->set404Override(function () {
     $this->response->setStatusCode(404, 'Nope. Not here.');
