@@ -6,6 +6,7 @@ use CodeIgniter\RESTful\ResourceController;
 use CodeIgniter\API\ResponseTrait;
 use Firebase\JWT\JWT;
 use App\Models\PembelianModel;
+use App\Models\JurnalModel;
 class Pembelian extends ResourceController
 {
     private $db;
@@ -39,29 +40,27 @@ class Pembelian extends ResourceController
         // request 
         $search = $this->request->getGet('search') != "" ? $this->request->getGet('search') : "";
         $status = $this->request->getGet('status') != "" ? $this->request->getGet('status') : "";
+         // start date dan end date
+        $startDate  = $this->request->getGet('startDate') != "" ? $this->request->getGet('startDate') : "";
+        $endDate    = $this->request->getGet('endDate') != "" ? $this->request->getGet('endDate') : "";
         // Query
+        $model = new PembelianModel();
+        //
         $sql = $this->db->table('pembelian pm');
-        $sql->select('pm.pembelian_nota as pmnota');
-        $sql->select('pm.pembelian_waktu as pmwaktu');
-        $sql->select('pm.pembelian_total as pmtotal');
-        $sql->select('pm.pembelian_keterangan as pmketerangan');
-        $sql->select('pm.pengguna_id as pid');
-        $sql->select('pgn.pengguna_nama as pnama');
-        $sql->select('pm.pembelian_is_valid as pmisvalid');
-        $sql->select('ac.pengguna_nama as acpenerima');
-        $sql->join('pengguna pgn', 'pgn.pengguna_id = pm.pengguna_id', 'left');
-        $sql->join('pengguna ac', 'ac.pengguna_id = pm.accepted_id', 'left');
+        $model->selectData($sql);
+        $model->relation($sql);
+        // filter Tanggal
+        $model->filterDate($sql, [
+            'startDate' => $startDate,
+            'endDate'   => $endDate,
+        ]);
+        // Penutup filter Tanggal
+        $model->searchData($sql, $search);
         // Jika ada params search
-        if ($search != "") {
-            $sql->groupStart();
-            $sql->like('pm.pembelian_nota', $search, 'both');
-            $sql->orLike('pm.pembelian_total', $search, 'both');
-            $sql->orLike('pgn.pengguna_nama', $search, 'both');
-            $sql->groupEnd();
-        }
-
         if ($getLevel->level != "Admin") $sql->where(['pm.pengguna_id' => $getLevel->id]);
         if ($status) $sql->where(['pm.pembelian_is_valid' => $status]);
+        //
+        $sql->orderBy('pm.pembelian_waktu', 'desc');
         // Jika ada params status
         $sql->limit($limit, $page * $limit);
         // result
@@ -91,10 +90,31 @@ class Pembelian extends ResourceController
         // };
         return $this->fail("Maaf anda tidak bisa mengakses halaman ini!!");
     }
-    //
-    private function _tambahCatatanKeJurnal($req)
+    /**
+     * Sub Function tambah catatan ke kas
+     */
+    private function _tambahCatatanKeKas($req)
     {
-        
+        $model = new JurnalModel();
+        $data[] = [
+            'jurnal_kode' => $model->getUniqCode(1),
+            'rekening_kode' => 1,
+            'jurnal_ref_kode' => '101',
+            'jurnal_debet' => 0,
+            'jurnal_kredit' => $req['pembelian_total'],
+            'jurnal_keterangan' => 'Kredit dari Kas dengan Nota Pembelian Barang: ' . $req['pembelian_nota'],
+        ];
+        $data[] = [
+            'jurnal_kode' => $model->getUniqCode(5),
+            'rekening_kode' => 5,
+            'jurnal_ref_kode' => '501',
+            'jurnal_debet' => $req['pembelian_total'],
+            'jurnal_kredit' => 0,
+            'jurnal_keterangan' => 'Debit ke Aset (barang) dengan Nota Pembelian Barang: ' . $req['pembelian_nota'],
+        ];
+        $sql = $this->db->table('jurnal');
+        $sql->insertBatch($data);
+        // if () $this->_tambahCatatanKePM($req);
     }
     /**
      * Primary Function add data
@@ -133,7 +153,7 @@ class Pembelian extends ResourceController
             // if ($this->request->getVar('pmisvalid') == "Ya") 
                 // $this->_tambahStok($req['produk_kode'], $req['restok_produk_jumlah']);
             if ($this->request->getVar('pmisvalid') == "Ya") 
-                $this->_tambahCatatanKeJurnal($req);
+                $this->_tambahCatatanKeKas($req);
             return $this->setResponseFormat('json')->respond([
                 'status' => 200,
                 'error' => false,
@@ -165,11 +185,15 @@ class Pembelian extends ResourceController
             }
             if ($this->request->getVar('pmtotal')) { 
                 $req['pembelian_total']      = $this->request->getVar('pmtotal');
+            } else {
+                $req['pembelian_total']      = $check['pembelian_total'];
             }
             if ($this->request->getVar('pmketerangan')) { 
                 $req['pembelian_keterangan'] = $this->request->getVar('pmketerangan');
             }
             if ($model->save($req)) {
+                if ($this->request->getVar('pmisvalid') == "Ya") 
+                $this->_tambahCatatanKeKas($req);
                 return $this->setResponseFormat('json')->respond([
                     'status' => 200,
                     'error' => false,
@@ -180,7 +204,7 @@ class Pembelian extends ResourceController
             } else return $this->fail("Gagal melakukan perubahan transaksi pembelian..!");
 
         }
-        else return $this->fail("Gagal mengubah data transaksi pembelian..!");
+        else return $this->fail($check['message']);
     }
     /**
      * Sub Function before update data
@@ -197,15 +221,20 @@ class Pembelian extends ResourceController
         ];
 
         else {
+            $status = true;
+            $message = '';
             $check = $checkData->getRowArray();
             if ($check['pembelian_is_valid'] == "Ya") {
-                
+                $status = false;
+                $message = 'Maaf tidak bisa mengubah transaksi yang sudah valid!!..';
             } 
 
             return [
-                'status' => true,
+                'status' => $status,
                 'pn' => $check['pembelian_nota'],
+                'pembelian_total' => $check['pembelian_total'],
                 'statusBefore' => $check['pembelian_is_valid'],
+                'message' => $message
             ];
         }
     }

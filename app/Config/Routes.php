@@ -58,10 +58,22 @@ $routes->delete('api/v1/bahan/(:alphanum)', 'Bahan::deleteData/$1', ['filter'=>'
 $routes->get('api/v1/resproduk', 'RestokProduk::showData', ['filter'=>'auth']);
 $routes->post('api/v1/resproduk', 'RestokProduk::addData', ['filter'=>'auth']);
 $routes->put('api/v1/resproduk/(:num)', 'RestokProduk::updateData/$1', ['filter'=>'auth']);
-// Restok Produk
+// Pembelian
 $routes->get('api/v1/pembelian', 'Pembelian::showData', ['filter'=>'auth']);
 $routes->post('api/v1/pembelian', 'Pembelian::addData', ['filter'=>'auth']);
 $routes->put('api/v1/pembelian', 'Pembelian::updateData', ['filter'=>'auth']);
+// Penjualan
+$routes->get('api/v1/penjualan', 'Penjualan::showData', ['filter'=>'auth']);
+$routes->post('api/v1/penjualan', 'Penjualan::addData', ['filter'=>'auth']);
+$routes->put('api/v1/penjualan', 'Penjualan::updateData', ['filter'=>'auth']);
+// Jurnal
+$routes->get('api/v1/jurnal', 'Jurnal::showData', ['filter'=>'auth']);
+$routes->post('api/v1/jurnal', 'Jurnal::addData', ['filter'=>'auth']);
+$routes->get('api/v1/jurnal/rekening', 'Jurnal::showRekening', ['filter'=>'auth']);
+$routes->get('api/v1/jurnal/ref', 'Jurnal::showRef', ['filter'=>'auth']);
+// $routes->put('api/v1/jurnal', 'Jurnal::updateData', ['filter'=>'auth''[']);
+// Pendapatan Pengeluaran
+$routes->get('api/v1/pp', 'Info::ppData', ['filter'=>'auth']);
 //
 $routes->set404Override(function () {
     $this->response->setStatusCode(404, 'Nope. Not here.');

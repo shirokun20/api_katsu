@@ -53,6 +53,52 @@ class PembelianModel extends Model
     public function __construct() {
         $this->db = \Config\Database::connect();
     }
+
+    public function relation($sql)
+    {
+        $sql->join('pengguna pgn', 'pgn.pengguna_id = pm.pengguna_id', 'left');
+        $sql->join('pengguna ac', 'ac.pengguna_id = pm.accepted_id', 'left');
+    }
+
+    public function selectData($sql)
+    {
+        $sql->select('pm.pembelian_nota as pmnota');
+        $sql->select('pm.pembelian_waktu as pmwaktu');
+        $sql->select('pm.pembelian_total as pmtotal');
+        $sql->select('pm.pembelian_keterangan as pmketerangan');
+        $sql->select('pm.pengguna_id as pid');
+        $sql->select('pgn.pengguna_nama as pnama');
+        $sql->select('pm.pembelian_is_valid as pmisvalid');
+        $sql->select('ac.pengguna_nama as acpenerima');
+    }
+
+    public function filterDate($sql, $date)
+    {
+        if ($date['startDate'] && $date['endDate']) {
+            $sql->where('DATE(pm.pembelian_waktu) between "' . $date['startDate'] . '" and "' . $date['endDate'] . '"');
+        } elseif ($date['startDate']) {
+            $sql->where('DATE(pm.pembelian_waktu)', $date['startDate']);
+        } elseif ($date['endDate']) {
+            $sql->where('DATE(pm.pembelian_waktu)', $date['endDate']);
+        }
+    }
+
+    public function filterMonthYear($sql, $data) 
+    {
+        if ($data['month']) $sql->where(['month(pm.pembelian_waktu)'=>$data['month']]);
+        if ($data['year']) $sql->where(['year(pm.pembelian_waktu)'=>$data['year']]);
+    }
+
+    public function searchData($sql, $search = "")
+    {
+        if ($search != "") {
+            $sql->groupStart();
+            $sql->like('pm.pembelian_nota', $search, 'both');
+            $sql->orLike('pm.pembelian_total', $search, 'both');
+            $sql->orLike('pgn.pengguna_nama', $search, 'both');
+            $sql->groupEnd();
+        }
+    }
     
     public function getUniqCode($pengguna_id = 0, $date = null)
     {
@@ -60,7 +106,7 @@ class PembelianModel extends Model
         $sql->select('RIGHT(pembelian.pembelian_nota,4) as kode_nota');
         $sql->orderBy('pembelian.pembelian_nota', 'DESC');
         $sql->limit(1);
-        if ($date != null) {
+        if ($date) {
             $sql->where(['date(pembelian.pembelian_waktu)' => $date]);
         } else {
             $sql->where(['date(pembelian.pembelian_waktu)' => date('Y-m-d')]);
@@ -75,7 +121,7 @@ class PembelianModel extends Model
         }
 
         $batas = str_pad($kode, 4, "0", STR_PAD_LEFT);
-        $kodetampil = "PB-" . ($date != null ?  $date : date('dmY-')) . $pengguna_id . '-' .$batas;
+        $kodetampil = "PB-" . ($date ?  $date : date('dmY-')) . $pengguna_id . '-' .$batas;
         return $kodetampil;
     }
 }

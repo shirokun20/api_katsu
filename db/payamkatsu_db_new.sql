@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Waktu pembuatan: 22 Okt 2021 pada 16.47
+-- Waktu pembuatan: 12 Nov 2021 pada 13.44
 -- Versi server: 10.4.17-MariaDB
 -- Versi PHP: 7.3.26
 
@@ -67,6 +67,14 @@ CREATE TABLE `detail_penjualan` (
   `detail_penjualan_total` int(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Dumping data untuk tabel `detail_penjualan`
+--
+
+INSERT INTO `detail_penjualan` (`detail_penjualan_id`, `produk_kode`, `penjualan_nota`, `detail_penjualan_qty`, `detail_penjualan_harga`, `detail_penjualan_total`) VALUES
+(1, 'AK', 'PJ-05112021-1-0001', 1, 7000, 7000),
+(2, 'NS', 'PJ-05112021-1-0001', 2, 5000, 10000);
+
 -- --------------------------------------------------------
 
 --
@@ -74,14 +82,49 @@ CREATE TABLE `detail_penjualan` (
 --
 
 CREATE TABLE `jurnal` (
-  `jurnal_kode` varchar(100) NOT NULL COMMENT 'DU-tgl-0001',
-  `jurnal_waktu` datetime NOT NULL,
-  `jurnal_ref` varchar(100) NOT NULL,
-  `jurnal_debet` int(100) NOT NULL,
-  `jurnal_kredit` int(100) NOT NULL,
-  `jurnal_saldo` int(100) NOT NULL,
+  `jurnal_id` int(100) NOT NULL,
+  `jurnal_kode` varchar(100) NOT NULL COMMENT 'ju-koderek-mY-0001',
+  `rekening_kode` varchar(2) DEFAULT NULL,
+  `jurnal_waktu` datetime DEFAULT current_timestamp(),
+  `jurnal_ref_kode` int(11) NOT NULL,
+  `jurnal_debet` int(100) NOT NULL DEFAULT 0,
+  `jurnal_kredit` int(100) NOT NULL DEFAULT 0,
   `jurnal_keterangan` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data untuk tabel `jurnal`
+--
+
+INSERT INTO `jurnal` (`jurnal_id`, `jurnal_kode`, `rekening_kode`, `jurnal_waktu`, `jurnal_ref_kode`, `jurnal_debet`, `jurnal_kredit`, `jurnal_keterangan`) VALUES
+(1, 'JU-1-112021-0001', '1', '2021-11-05 23:01:17', 101, 17000, 0, 'Debit dari Kas dengan Nota Penjualan Produk: PJ-05112021-1-0001 (Sudah termasuk ongkir!)'),
+(2, 'JU-4-112021-0001', '4', '2021-11-05 23:01:17', 401, 0, 17000, 'Kredit ke Aset (produk) dengan Nota Penjualan Produk: PJ-05112021-1-0001 (Sudah termasuk ongkir!)'),
+(3, 'JU-1-112021-0002', '1', '2021-11-05 23:01:45', 101, 0, 40000, 'Kredit dari Kas dengan Nota Pembelian Barang: PB-05112021-1-0001'),
+(4, 'JU-5-112021-0001', '5', '2021-11-05 23:01:45', 501, 40000, 0, 'Debit ke Aset (barang) dengan Nota Pembelian Barang: PB-05112021-1-0001'),
+(20, 'JU-1-112021-0003', '1', '2021-11-08 17:28:56', 101, 100000, 0, 'Modal usaha dan pendapatan sebesar xxxx'),
+(21, 'JU-3-112021-0001', '3', '2021-11-08 17:28:56', 301, 0, 50000, 'Modal usaha sebesar: xxxx'),
+(22, 'JU-4-112021-0002', '4', '2021-11-08 17:28:56', 401, 0, 50000, 'Pendapatan penjualan katsu sebesar: xxxx');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `jurnal_ref`
+--
+
+CREATE TABLE `jurnal_ref` (
+  `jurnal_ref_kode` int(11) NOT NULL,
+  `jurnal_ref_nama` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data untuk tabel `jurnal_ref`
+--
+
+INSERT INTO `jurnal_ref` (`jurnal_ref_kode`, `jurnal_ref_nama`) VALUES
+(101, 'Kas'),
+(301, 'Modal'),
+(401, 'Pendapatan Usaha (Penjualan)'),
+(501, 'Biaya/Beban (Pembelian)');
 
 -- --------------------------------------------------------
 
@@ -91,12 +134,20 @@ CREATE TABLE `jurnal` (
 
 CREATE TABLE `pembelian` (
   `pembelian_nota` varchar(100) NOT NULL COMMENT 'PB-TGL-PENGGUNA_ID-0001',
-  `pembelian_waktu` datetime NOT NULL,
+  `pembelian_waktu` datetime NOT NULL DEFAULT current_timestamp(),
   `pembelian_total` int(10) NOT NULL,
-  `pembelian_keterangan` int(11) NOT NULL,
+  `pembelian_keterangan` text NOT NULL,
   `pengguna_id` int(10) NOT NULL,
-  `pembelian_is_valid` enum('Ya','Tidak','Menunggu divalidasi') NOT NULL DEFAULT 'Menunggu divalidasi'
+  `pembelian_is_valid` enum('Ya','Tidak','Menunggu divalidasi') NOT NULL DEFAULT 'Menunggu divalidasi',
+  `accepted_id` int(10) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data untuk tabel `pembelian`
+--
+
+INSERT INTO `pembelian` (`pembelian_nota`, `pembelian_waktu`, `pembelian_total`, `pembelian_keterangan`, `pengguna_id`, `pembelian_is_valid`, `accepted_id`) VALUES
+('PB-05112021-1-0001', '2021-11-05 23:01:45', 40000, 'Membeli: ayam fillet', 1, 'Ya', 1);
 
 -- --------------------------------------------------------
 
@@ -120,7 +171,7 @@ CREATE TABLE `pengguna` (
 INSERT INTO `pengguna` (`pengguna_id`, `pengguna_nama`, `pengguna_nohp`, `pengguna_jenis`, `status_pengguna_id`, `pengguna_tgl_masuk`) VALUES
 (1, 'Shiro 2', '089661352511', 'Admin', 1, '2021-10-12'),
 (2, 'Pegawai 2', '089661352512', 'Admin', 1, '2021-10-13'),
-(3, 'Kepo Ah 3', '089661352513', 'Pegawai', 3, '2021-10-13');
+(3, 'Kepo Ah 3', '089661352513', 'Pegawai', 1, '2021-10-13');
 
 -- --------------------------------------------------------
 
@@ -138,9 +189,16 @@ CREATE TABLE `penjualan` (
   `penjualan_metode_pembayaran` enum('cash','transfer') NOT NULL,
   `penjualan_bukti_transfer` varchar(100) NOT NULL,
   `pengguna_id` int(10) NOT NULL,
-  `status_pembayaran_id` int(2) NOT NULL,
-  `status_pemesanan` int(2) NOT NULL
+  `status_pembayaran_id` int(2) NOT NULL DEFAULT 1,
+  `status_pemesanan_id` int(2) NOT NULL DEFAULT 4
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data untuk tabel `penjualan`
+--
+
+INSERT INTO `penjualan` (`penjualan_nota`, `penjualan_waktu`, `penjualan_sub_total`, `penjualan_ongkir`, `penjualan_total`, `penjualan_keterangan`, `penjualan_metode_pembayaran`, `penjualan_bukti_transfer`, `pengguna_id`, `status_pembayaran_id`, `status_pemesanan_id`) VALUES
+('PJ-05112021-1-0001', '2021-11-05 23:01:17', 17000, 0, 17000, 'Penjualan', 'cash', '', 1, 2, 2);
 
 -- --------------------------------------------------------
 
@@ -161,9 +219,31 @@ CREATE TABLE `produk` (
 --
 
 INSERT INTO `produk` (`produk_kode`, `produk_nama`, `produk_harga`, `produk_stok`, `produk_stok_retur`) VALUES
-('AK', 'Ayam Katsu', 7000, 20, 0),
-('NS', 'Nasi', 5000, 10, 0),
+('AK', 'Ayam Katsu', 7000, 19, 0),
+('NS', 'Nasi', 5000, 8, 0),
 ('PK', 'Paket Nasi Dan Ayam Katsu', 12000, 10, 0);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `rekening`
+--
+
+CREATE TABLE `rekening` (
+  `rekening_kode` int(1) NOT NULL,
+  `rekening_nama` varchar(100) NOT NULL,
+  `rekening_jenis` enum('debit','kredit','debit/kredit') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data untuk tabel `rekening`
+--
+
+INSERT INTO `rekening` (`rekening_kode`, `rekening_nama`, `rekening_jenis`) VALUES
+(1, 'Kas', 'debit/kredit'),
+(3, 'Modal', 'kredit'),
+(4, 'Pendapatan', 'kredit'),
+(5, 'Biaya Atau Beban (Pembelian)', 'debit');
 
 -- --------------------------------------------------------
 
@@ -227,7 +307,8 @@ CREATE TABLE `status_pemesanan` (
 INSERT INTO `status_pemesanan` (`status_pemesanan_id`, `status_pemesanan_nama`) VALUES
 (1, 'Pending Order'),
 (2, 'Selesai'),
-(3, 'Dikirim');
+(3, 'Dikirim'),
+(4, 'Diproses');
 
 -- --------------------------------------------------------
 
@@ -283,7 +364,13 @@ ALTER TABLE `detail_penjualan`
 -- Indeks untuk tabel `jurnal`
 --
 ALTER TABLE `jurnal`
-  ADD PRIMARY KEY (`jurnal_kode`);
+  ADD PRIMARY KEY (`jurnal_id`);
+
+--
+-- Indeks untuk tabel `jurnal_ref`
+--
+ALTER TABLE `jurnal_ref`
+  ADD PRIMARY KEY (`jurnal_ref_kode`);
 
 --
 -- Indeks untuk tabel `pembelian`
@@ -308,6 +395,12 @@ ALTER TABLE `penjualan`
 --
 ALTER TABLE `produk`
   ADD PRIMARY KEY (`produk_kode`);
+
+--
+-- Indeks untuk tabel `rekening`
+--
+ALTER TABLE `rekening`
+  ADD PRIMARY KEY (`rekening_kode`);
 
 --
 -- Indeks untuk tabel `restok_produk`
@@ -347,7 +440,13 @@ ALTER TABLE `suplier`
 -- AUTO_INCREMENT untuk tabel `detail_penjualan`
 --
 ALTER TABLE `detail_penjualan`
-  MODIFY `detail_penjualan_id` int(10) NOT NULL AUTO_INCREMENT;
+  MODIFY `detail_penjualan_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT untuk tabel `jurnal`
+--
+ALTER TABLE `jurnal`
+  MODIFY `jurnal_id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT untuk tabel `pengguna`
@@ -365,7 +464,7 @@ ALTER TABLE `restok_produk`
 -- AUTO_INCREMENT untuk tabel `status_pemesanan`
 --
 ALTER TABLE `status_pemesanan`
-  MODIFY `status_pemesanan_id` int(2) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `status_pemesanan_id` int(2) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT untuk tabel `status_pengguna`
