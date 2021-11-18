@@ -244,4 +244,22 @@ class Pengguna extends ResourceController
             'data' => $data->getResult(),
         ]);
     }
+    /**
+     * Primary Function get detail pengguna by token
+     */
+    use ResponseTrait;
+    public function showDetailByToken()
+    {
+        $getUser = $this->_checkLevel();
+        $check = $this->_showDetailQuery($getUser->id)->first();
+        if ($check) {
+            return $this->setResponseFormat('json')->respond([
+                'status' => 200,
+                'error' => false,
+                'data' => $check,
+            ]);
+        } else {
+            return $this->failNotFound("Akun tidak ditemukan!");
+        }
+    }
 }

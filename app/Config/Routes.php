@@ -37,6 +37,7 @@ $routes->post('api/v1/login', 'Login::index');
 // Pengguna
 $routes->get('api/v1/pengguna', 'Pengguna::showData', ['filter'=>'auth']);
 $routes->get('api/v1/pengguna/(:num)', 'Pengguna::showDetail/$1', ['filter'=>'auth']);
+$routes->get('api/v1/pengguna/token', 'Pengguna::showDetailByToken', ['filter'=>'auth']);
 $routes->post('api/v1/pengguna', 'Pengguna::addData', ['filter'=>'auth']);
 $routes->put('api/v1/pengguna/(:num)', 'Pengguna::updateData/$1', ['filter'=>'auth']);
 $routes->delete('api/v1/pengguna/(:num)', 'Pengguna::deleteData/$1', ['filter'=>'auth']);
