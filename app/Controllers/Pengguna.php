@@ -39,6 +39,7 @@ class Pengguna extends ResourceController
         // request 
         $search = $this->request->getGet('search') != "" ? $this->request->getGet('search') : "";
         $status = $this->request->getGet('status') != "" ? $this->request->getGet('status') : "";
+        $jp = $this->request->getGet('jp') != "" ? $this->request->getGet('jp') : "";
         // Query
         $pengguna
             ->select('pengguna_id as id')
@@ -52,13 +53,12 @@ class Pengguna extends ResourceController
             $pengguna->groupStart();
             $pengguna->like('pengguna.pengguna_nama', $search, 'both');
             $pengguna->orLike('pengguna.pengguna_nohp', $search, 'both');
-            $pengguna->orLike('pengguna.pengguna_jenis', $search, 'both');
             $pengguna->groupEnd();
         }
         // Jika ada params status
-        if ($status != "") {
-            $pengguna->where('pengguna.status_pengguna_id', $status);
-        }
+        if ($status != "") $pengguna->where('pengguna.status_pengguna_id', $status);
+        // 
+        if ($jp != "") $pengguna->where('pengguna.pengguna_jenis', $jp);
         // result
         return $pengguna->findAll($limit, $page * $limit);
     }

@@ -28,19 +28,21 @@ class Login extends ResourceController
 
         if (!$user) return $this->failNotFound('Nomor Handphone tidak ditemukan!!');
 
+        if ($user['pengguna_jenis'] == "Konsumen") return $this->fail('Maaf anda tidak bisa mengkases aplikasi ini!!');
+
         if ($user['status_pengguna_id'] == '1') {
             $key = getenv('TOKEN_SECRET');
             $issuer_claim 		= "THE_CLAIM"; // this can be the servername. Example: https://domain.com
             $audience_claim 	= "THE_AUDIENCE";
-            $issuedat_claim 	= time(); // issued at
-            $notbefore_claim 	= $issuedat_claim + 2; //not before in seconds
-            $expire_claim 		= $notbefore_claim + 3600;
+            $issuedat_claim 	= time() - 1000; // issued at
+            // $notbefore_claim 	= $issuedat_claim + 2; //not before in seconds
+            // $expire_claim 		= $notbefore_claim + 3600;
             $payload = array(
                 'iss' 	=> $issuer_claim,
                 'aud' 	=> $audience_claim,
                 'iat' 	=> $issuedat_claim,
-                'nbf' 	=> $notbefore_claim,
-                'exp' 	=> $expire_claim,
+                // 'nbf' 	=> $notbefore_claim,
+                // 'exp' 	=> $expire_claim,
                 "data" => [
                     "id" => (int) $user['pengguna_id'],
                     "nohp" => $user['pengguna_nohp'],

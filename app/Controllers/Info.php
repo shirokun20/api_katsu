@@ -100,7 +100,7 @@ class Info extends ResourceController
         return $data;
     }
     /**
-     * Sub Function from show Data
+     * Primary Function from show Data
      */
     use ResponseTrait;
     public function ppData()
@@ -124,5 +124,39 @@ class Info extends ResourceController
             ]
         ]);
         // };
+    }
+    /**
+     * Priamry Function from show Data
+     */
+    use ResponseTrait;
+    public function infoJumlahPengguna() 
+    {
+        $getLevel = $this->_checkLevel();
+        if ($getLevel->level != "Admin") return $this->fail("Maaf anda tidak bisa mengakses halaman ini!!");
+        $data = array(
+            [
+                'pengguna_jenis' => 'Admin',
+            ],
+            [
+                'pengguna_jenis' => 'Konsumen',
+            ],
+            [
+                'pengguna_jenis' => 'Pegawai',
+            ]
+        );
+        $output = [];
+        foreach ($data as $key) {
+            $r = [];
+            $sql = $this->db->table('pengguna')->where($key)->get()->getNumRows() ?? 0;
+            $r['total'] = $sql;
+            $r['pengguna_jenis'] = $key['pengguna_jenis'];
+            $output[] = $r;
+        }
+        // 
+        return $this->setResponseFormat('json')->respond([
+            'status' => 200,
+            'error' => false,
+            'data' => $output,
+        ]);
     }
 }
