@@ -197,11 +197,11 @@ class Pengguna extends ResourceController
                 'status' => 200,
                 'error' => false,
                 'message' => [
-                    "success" => "Berhasil melakukan pembaharuan data pengguna!"
+                    "success" => "Berhasil melakukan perubahan data pengguna!"
                 ],
             ]);
 
-            else return $this->fail("Gagal melakukan pembaharuan data pengguna!");
+            else return $this->fail("Gagal melakukan perubahan data pengguna!");
         }
         return $this->fail("Tidak ada data pengguna yang akan di diperbaharui!");
     }
@@ -253,11 +253,15 @@ class Pengguna extends ResourceController
         $getUser = $this->_checkLevel();
         $check = $this->_showDetailQuery($getUser->id)->first();
         if ($check) {
-            return $this->setResponseFormat('json')->respond([
-                'status' => 200,
-                'error' => false,
-                'data' => $check,
-            ]);
+            if ($check['status'] != "Aktif") {
+                return $this->fail("Akun anda sedang di suspend atau belum aktif!!");
+            } else {
+                return $this->setResponseFormat('json')->respond([
+                    'status' => 200,
+                    'error' => false,
+                    'data' => $check,
+                ]);
+            }
         } else {
             return $this->failNotFound("Akun tidak ditemukan!");
         }
