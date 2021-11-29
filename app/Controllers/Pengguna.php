@@ -110,7 +110,7 @@ class Pengguna extends ResourceController
         
         $req['pengguna_nohp']       = $this->request->getVar('phone');
         $req['pengguna_nama']       = $this->request->getVar('nama');
-        $req['pengguna_jenis']      = $this->request->getVar('level') == "Admin" ? "Admin" : "Pegawai";;
+        $req['pengguna_jenis']      = $this->request->getVar('level');
         $req['status_pengguna_id']  = 1;
 
         if ($model->save($req)) return $this->setResponseFormat('json')->respond([
