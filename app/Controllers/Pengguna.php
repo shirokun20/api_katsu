@@ -189,7 +189,7 @@ class Pengguna extends ResourceController
             else return $this->fail("Maaf anda tidak bisa melakukan perubahan dengan nomor handphone yang sudah digunakan!!!");
 
         };
-        if ($this->request->getVar('level') && $getLevel->level == "Admin") $req['pengguna_jenis'] = $this->request->getVar('level') != "Pegawai" ? "Admin" : "Pegawai";
+        if ($this->request->getVar('level') && $getLevel->level == "Admin") $req['pengguna_jenis'] = $this->request->getVar('level');
         if ($this->request->getVar('status') && $getLevel->level == "Admin") $req['status_pengguna_id'] = $this->request->getVar('status');
         //
         if (count($req) > 1) {
