@@ -44,7 +44,6 @@ class Produk extends ResourceController
         $sql->select('produk_nama as pnama');
         $sql->select('produk_harga as pharga');
         $sql->select('produk_stok as pstok');
-        $sql->select('produk_stok_retur as pretur');
         // Jika ada params search
         if ($search != "") {
             $sql->groupStart();
@@ -104,7 +103,6 @@ class Produk extends ResourceController
         $req['produk_nama']           = $this->request->getVar('pnama');
         $req['produk_harga']          = $this->request->getVar('pharga');
         $req['produk_stok']           = $this->request->getVar('pstok');
-        if ($this->request->getVar('pretur')) $req['produk_stok_retur'] = $this->request->getVar('pretur');
 
         if ($model->save($req)) return $this->setResponseFormat('json')->respond([
             'status' => 200,
@@ -159,7 +157,6 @@ class Produk extends ResourceController
         if ($this->request->getVar('pnama')) $req['produk_nama']        = $this->request->getVar('pnama');
         if ($this->request->getVar('pharga')) $req['produk_harga']      = $this->request->getVar('pharga');
         if ($this->request->getVar('pstok')) $req['produk_stok']        = $this->request->getVar('pstok');
-        if ($this->request->getVar('pretur')) $req['produk_stok_retur'] = $this->request->getVar('pretur');
         if ($model->save($req)) return $this->setResponseFormat('json')->respond([
             'status' => 200,
             'error' => false,
