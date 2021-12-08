@@ -46,4 +46,18 @@ class RpModel extends Model
     protected $afterFind            = [];
     protected $beforeDelete         = [];
     protected $afterDelete          = [];
+
+
+    public function filterDate($sql, $date)
+    {
+        if ($date['startDate'] && $date['endDate']) {
+            $sql->where('DATE(rp.restok_produk_waktu) between "' . $date['startDate'] . '" and "' . $date['endDate'] . '"');
+        } elseif ($date['startDate']) {
+            $sql->where('DATE(rp.restok_produk_waktu)', $date['startDate']);
+        } elseif ($date['endDate']) {
+            $sql->where('DATE(rp.restok_produk_waktu)', $date['endDate']);
+        }
+    }
+
+
 }

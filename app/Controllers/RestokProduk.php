@@ -36,7 +36,12 @@ class RestokProduk extends ResourceController
         // request 
         $search = $this->request->getGet('search') != "" ? $this->request->getGet('search') : "";
         $status = $this->request->getGet('status') != "" ? $this->request->getGet('status') : "";
+        $waktu  = $this->request->getGet('waktu') != "" ? $this->request->getGet('waktu') : "";
+        $startDate  = $this->request->getGet('startDate') != "" ? $this->request->getGet('startDate') : "";
+        $endDate    = $this->request->getGet('endDate') != "" ? $this->request->getGet('endDate') : "";
         // Query
+        $model = new RpModel();
+        //
         $sql = $this->db->table('restok_produk rp');
         $sql->select('rp.restok_produk_id as rpid');
         $sql->select('rp.restok_produk_waktu as rpwaktu');
@@ -50,8 +55,7 @@ class RestokProduk extends ResourceController
         // Jika ada params search
         if ($search) {
             $sql->groupStart();
-            $sql->like('rp.restok_produk_waktu', $search, 'both');
-            $sql->orLike('rp.restok_produk_jumlah', $search, 'both');
+            $sql->like('rp.restok_produk_jumlah', $search, 'both');
             $sql->orLike('p.pengguna_nama', $search, 'both');
             $sql->orLike('rp.produk_kode', $search, 'both');
             $sql->orLike('pdk.produk_nama', $search, 'both');
@@ -59,6 +63,13 @@ class RestokProduk extends ResourceController
         }
         //
         if ($status) $sql->where(['rp.restok_produk_is_valid' => $status]);
+        //
+        if ($waktu) $sql->where(['date(rp.restok_produk_waktu)' => $waktu]);
+        //
+        $model->filterDate($sql, [
+            'startDate' => $startDate,
+            'endDate'   => $endDate,
+        ]);
         //
         $sql->orderBy('rp.restok_produk_waktu', 'desc');
         // Jika ada params status
