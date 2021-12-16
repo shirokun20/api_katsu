@@ -50,6 +50,7 @@ class Produk extends ResourceController
             $sql->like('produk_nama', $search, 'both');
             $sql->orLike('produk_harga', $search, 'both');
             $sql->orLike('produk_stok', $search, 'both');
+            $sql->orLike('produk_kode', $search, 'both');
             $sql->groupEnd();
         }
         // Jika ada params status
