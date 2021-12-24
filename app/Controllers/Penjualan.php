@@ -98,6 +98,7 @@ class Penjualan extends ResourceController
         if ($stpem) $sql->where(['pj.status_pemesanan_id' => $stpem]);
         //
         $sql->orderBy('pj.penjualan_waktu', 'desc');
+        $sql->orderBy('pj.penjualan_nota', 'desc');
         // Jika ada params status
         $sql->limit($limit, $page * $limit);
         // result
@@ -121,6 +122,8 @@ class Penjualan extends ResourceController
             $r['pjtotal']       = $value->pjtotal;
             $r['pjketerangan']  = $value->pjketerangan;
             $r['pjmetpem']      = $value->pjmetpem;
+            $r['pjstbyrid']     = $value->pjstbyrid;
+            $r['pjstpemid']     = $value->pjstpemid;
             //
             $r['pnama']         = $value->pnama;
             //

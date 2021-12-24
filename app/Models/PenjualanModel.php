@@ -61,6 +61,8 @@ class PenjualanModel extends Model
         $sql->select('pj.penjualan_ongkir as pjongkir');
         $sql->select('pj.penjualan_keterangan as pjketerangan');
         $sql->select('pj.penjualan_metode_pembayaran as pjmetpem');
+        $sql->select('pj.status_pembayaran_id as pjstbyrid');
+        $sql->select('pj.status_pemesanan_id as pjstpemid');
         $sql->select('pj.pengguna_id as pid');
         $sql->select('pgn.pengguna_nama as pnama');
         $sql->select('stbyr.status_pembayaran_nama as stbyrnm');
