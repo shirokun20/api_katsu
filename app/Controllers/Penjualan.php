@@ -314,7 +314,7 @@ class Penjualan extends ResourceController
         if ($check['status']) {
             $model = new PenjualanModel();
             $req['penjualan_metode_pembayaran'] = $this->request->getVar('pjmetpem');
-            if ($this->request->getVar('pjongkir'))
+            if ($this->request->getVar('pjongkir') > -1)
                 $req['penjualan_ongkir']        = $this->request->getVar('pjongkir');
             else $req['penjualan_ongkir']       = $check['ongkir'];
             if ($this->request->getVar('pjketerangan'))
