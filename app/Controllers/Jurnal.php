@@ -41,6 +41,9 @@ class Jurnal extends ResourceController
          // start date dan end date
          $startDate  = $this->request->getGet('startDate') != "" ? $this->request->getGet('startDate') : "";
          $endDate    = $this->request->getGet('endDate') != "" ? $this->request->getGet('endDate') : "";
+         // 
+         $limit  = $this->request->getGet('limit') != "" ? $this->request->getGet('limit') : 5;
+         $page   = $this->request->getGet('page') != "" ? $this->request->getGet('page') : 0;
          // bulan dan tahun
          $model = new JurnalModel();
          $sql = $this->db->table('jurnal j');
@@ -54,7 +57,8 @@ class Jurnal extends ResourceController
              'year' => $year,
          ]);
 
-        $sql->orderBy('j.jurnal_id', 'asc');
+        $sql->orderBy('j.jurnal_id', 'desc');
+        $sql->limit($limit, $page * $limit);
         // result
         $result = $sql->get();
         return $result->getResult();
